@@ -25,12 +25,52 @@
             inst = await WebAssembly.instantiate(mod, go.importObject)
         }).catch((err) => {
             console.error(err);
+            alert("WebAssembly load failed, error: " + err)
         });
     </script>
 </head>
 
 <body>
     <button id="myButton">myButton</button>
+    <hr>
+    <p>
+        <h5>call base64 functions from Goalng</h5>
+        <textarea id="for_base64" cols="30" rows="10" spellcheck="false"></textarea>
+        <br>
+        <button onclick="do_base64_encode()">Base64 Encode</button>
+        <button onclick="do_base64_decode()">Base64 Decode</button>
+    </p>
 </body>
+<script>
+    const base64_input_box = document.getElementById("for_base64")
+
+    function do_base64_encode() {
+        let str = base64_input_box.value
+        let {
+            ok,
+            data,
+            error
+        } = base64_encode(str)
+        if (!ok) {
+            alert("Error: " + error)
+            return
+        }
+        base64_input_box.value = data
+    }
+
+    function do_base64_decode() {
+        let str = base64_input_box.value
+        let {
+            ok,
+            data,
+            error
+        } = base64_decode(str)
+        if (!ok) {
+            alert("Error: " + error)
+            return
+        }
+        base64_input_box.value = data
+    }
+</script>
 
 </html>
