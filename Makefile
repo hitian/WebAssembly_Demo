@@ -1,6 +1,6 @@
 .PHONY: clean build
 
-go_beta_bin=go1.13beta1
+go_beta_bin=go1.13rc1
 
 clean: 
 	rm -rf main.wasm
