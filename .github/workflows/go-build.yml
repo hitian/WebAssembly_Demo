@@ -20,4 +20,4 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Build
-      run: make build-beta
+      run: make build
