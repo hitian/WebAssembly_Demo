@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"runtime"
 	"sync"
 	"syscall/js"
 )
@@ -46,6 +47,11 @@ func registerJsFunctions() {
 	// add event listener on element.
 	button.Call("addEventListener", "click", cb)
 
+	goVersionDiv := js.Global().Get("document").Call("getElementById", "go_version")
+	if goVersionDiv.Type() != js.TypeNull {
+		goVersionDiv.Set("innerHTML", "go runtime version: "+runtime.Version())
+	}
+
 	//add global function
 	var testFunctionParams js.Func
 	testFunctionParams = js.FuncOf(printFunctionArgs)
@@ -54,6 +60,9 @@ func registerJsFunctions() {
 	js.Global().Set("add", add())
 	js.Global().Set("base64_encode", base64Coder(base64Encode))
 	js.Global().Set("base64_decode", base64Coder(base64Decode))
+	js.Global().Set("go_version", js.FuncOf(func(this js.Value, args []js.Value) (result interface{}) {
+		return runtime.Version()
+	}))
 }
 
 func printFunctionArgs(this js.Value, args []js.Value) interface{} {
