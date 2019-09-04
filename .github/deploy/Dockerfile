@@ -6,4 +6,5 @@ LABEL "com.github.actions.icon"="globe"
 LABEL "com.github.actions.color"="green"
 
 RUN apk add git
+ADD . .
 ENTRYPOINT ["/entrypoint.sh"]
