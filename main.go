@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"strings"
 	"sync"
 	"syscall/js"
+
+	"github.com/hitian/WebAssembly_Demo/utils"
 )
 
 type base64OperationType int
@@ -63,6 +66,8 @@ func registerJsFunctions() {
 	js.Global().Set("go_version", js.FuncOf(func(this js.Value, args []js.Value) (result interface{}) {
 		return runtime.Version()
 	}))
+	js.Global().Set("jwt_encode", jwtEncode())
+	js.Global().Set("jwt_decode", jwtDecode())
 }
 
 func printFunctionArgs(this js.Value, args []js.Value) interface{} {
@@ -116,6 +121,67 @@ func base64Coder(t base64OperationType) js.Func {
 		}
 		val := createResult()
 		val["data"] = res
+		result = val
+		return
+	})
+}
+
+func jwtEncode() js.Func {
+	return js.FuncOf(func(this js.Value, args []js.Value) (result interface{}) {
+		defer func() {
+			if err := recover(); err != nil {
+				result = createErrorResult(fmt.Errorf("%s", err))
+				return
+			}
+		}()
+		if len(args) != 2 {
+			return createErrorResult(errors.New("wrong args length"))
+		}
+
+		secret := args[0].String()
+		content := args[1].String()
+
+		signedString, err := utils.JwtGenerate(secret, content)
+		if err != nil {
+			fmt.Printf("%#v", err)
+			panic(err)
+		}
+
+		val := createResult()
+		val["data"] = signedString
+		result = val
+		return
+	})
+}
+
+func jwtDecode() js.Func {
+	return js.FuncOf(func(this js.Value, args []js.Value) (result interface{}) {
+		defer func() {
+			if err := recover(); err != nil {
+				result = createErrorResult(fmt.Errorf("%s", err))
+				return
+			}
+		}()
+		if len(args) != 2 {
+			return createErrorResult(errors.New("wrong args length"))
+		}
+
+		secret := args[0].String()
+		content := args[1].String()
+
+		content = strings.TrimSpace(content)
+		content = strings.ReplaceAll(content, "\n", "")
+		content = strings.ReplaceAll(content, "\r\n", "")
+
+		ok, json, err := utils.JwtVerify(secret, content)
+		if err != nil {
+			fmt.Printf("%#v", err)
+			panic(err)
+		}
+
+		val := createResult()
+		val["data"] = json
+		val["checked"] = ok
 		result = val
 		return
 	})
