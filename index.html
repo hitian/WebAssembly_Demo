@@ -40,9 +40,64 @@
         <button onclick="do_base64_encode()">Base64 Encode</button>
         <button onclick="do_base64_decode()">Base64 Decode</button>
     </p>
+    <p>
+        <h5>JWT tools (method HS256)</h5>
+        <input type="text" id="jwt_secret" placeholder="JWT secret"><br>
+        <textarea id="jwt_content" cols="30" rows="10" spellcheck="false"></textarea><br>
+        <button onclick="jwt_op('encode')">JWT Encode</button>
+        <button onclick="jwt_op('decode')">JWT Decode</button>
+    </p>
     <div id="go_version"></div>
 </body>
 <script>
+    function jwt_op(op) {
+        let secret = document.getElementById("jwt_secret").value
+        let content = document.getElementById("jwt_content").value
+        if (!content) {
+            alert("jwt content can not empty");
+            return
+        }
+
+        if (op == "encode") {
+            if (!secret) {
+                alert("secret can not empty.");
+                return;
+            }
+            try {
+                JSON.parse(content)
+            } catch (e) {
+                alert("encode content must be json format")
+                return
+            }
+            let {
+                ok,
+                data,
+                error
+            } = jwt_encode(secret, content)
+            if (!ok) {
+                alert("Error: " + error)
+                return
+            }
+            document.getElementById("jwt_content").value = data
+        } else {
+            let {
+                ok,
+                data,
+                checked,
+                error
+            } = jwt_decode(secret, content)
+            if (!ok) {
+                alert("Error: " + error)
+                return
+            }
+            document.getElementById("jwt_content").value = data
+            if (!checked) {
+                alert("signed check failed")
+            }
+        }
+
+
+    }
     const base64_input_box = document.getElementById("for_base64")
 
     function do_base64_encode() {
