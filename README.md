@@ -5,11 +5,6 @@
 * RUN `make build serve`
 * OPEN [http://localhost:9000/](http://localhost:9000/)
 
-## install go1.13rc1
+## go version
 
-```shell
-
-go get golang.org/dl/go1.13rc1
-go1.13rc1 download
-
-```
+require go 1.13
